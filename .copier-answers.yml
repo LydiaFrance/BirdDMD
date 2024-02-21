@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier
+_commit: v2024-02-06
+_src_path: gh:alan-turing-institute/python-project-template
+backend: setuptools
+coc: their_coc
+email: lfrance@turing.ac.uk
+full_name: Lydia France
+license: MIT
+min_python_version: '3.10'
+org: LydiaFrance
+project_name: BirdDMD
+project_short_description: 'Using DMD on bird wing data. '
+python_name: birddmd
+typing: no_typing
+url: https://github.com/LydiaFrance/BirdDMD
