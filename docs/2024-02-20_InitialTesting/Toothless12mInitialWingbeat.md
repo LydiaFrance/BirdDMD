@@ -1,6 +1,7 @@
 # Experiment: Initial Wingbeat by One Bird
 
 > 2024-02-20 Using 01_InitialWingbeatToothless12m.ipynb
+> [Github Link to notebook code](https://github.com/LydiaFrance/BirdDMD/blob/main/src/birddmd/01_InitialWingbeatToothless12m.ipynb)
 
 ## Input Data
 
@@ -80,6 +81,17 @@ Looking at a plot of the raw data over time with the same vertical grid lines:
 </p>
 
 
+Just in case, I ran the DMD again with the following settings:
+
+```python
+delay_optdmd = hankel_preprocessing(BOPDMD(svd_rank=9, num_trials=0, eig_constraints={"imag", "conjugate_pairs"}), d=2)
+delay_optdmd.fit(markers, t=seqTime[1:])
+```
+
+<p align="center">
+    <img src="../imgs/2024-02-21_9DynamicPlotInitial.png" width=500>
+    <img src="../imgs/2024-02-21_9DMDFigureInitial.png" width=600>
+</p>
 
 
 ## Questions
@@ -87,5 +99,8 @@ Looking at a plot of the raw data over time with the same vertical grid lines:
 - How do the peaks in the modes relate to the waveforms we see in the raw data?
 - Are the positive/negative units arbitrary?
 - How does the x axis work for the dynamics plot?
-- General questions about looking at different settings for DMD, why is it so different between them?
+- What does the magnitude mean?
+- General questions about looking at different settings for DMD, why is it so different between 7 and 9 (and others)?
+
+
 
