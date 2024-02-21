@@ -1,6 +1,7 @@
 # Experiment: Four Wingbeats by One Bird
 
 > 2024-02-20 Using 03_FlappingToothless12m.ipynb
+> [Github Link to notebook code](https://github.com/LydiaFrance/BirdDMD/blob/main/src/birddmd/03_FlappingToothless12m.ipynb)
 
 ## Input Data
 
