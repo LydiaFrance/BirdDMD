@@ -35,14 +35,14 @@ An adjusted time was calculated such that each sequence was concatenated -- with
 
 ## DMD Analysis
 
-The input marker data was `12 x 4879` in size.   
+The input marker data was `12 x 17927` in size.   
 
 The following settings were used:
 
 ```python
 delay_optdmd = hankel_preprocessing(BOPDMD(svd_rank=7, num_trials=0, eig_constraints={"imag", "conjugate_pairs"}), d=2)
 delay_optdmd.fit(markers, t=seqTime[1:])
-plot_summary(delay_optdmd, index_modes=[1,3,5], order='F') 
+plot_summary(delay_optdmd, index_modes=[0,2,4], order='F') 
 ```
 
 Which produced the following plot. 
@@ -51,7 +51,7 @@ Which produced the following plot.
     <img src="../imgs/2024-02-20_DMDFigureFlaps.png" width=500>
 </p>
 
-*Figure 3: Output of the DMD Analysis. Modes 2,4,6 are shown.*
+*Figure 3: Output of the DMD Analysis. Modes 1,3,5 are shown.*
 
 ## Dynamics Plot
 
