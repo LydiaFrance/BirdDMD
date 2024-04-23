@@ -2,8 +2,8 @@
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 [project]
-name = "BirdDMD"
-version = "0.1.0"  # need to also update version in src/BirdDMD/__init__.py
+name = "birddmd"
+version = "0.1.0"  # need to also update version in src/birddmd/__init__.py
 authors = [
   { name = "Lydia France", email = "lfrance@turing.ac.uk" },
 ]
@@ -33,7 +33,7 @@ dependencies = ["pandas",
                 "jupyter",
                 "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds"]
 [tool.setuptools.dynamic]
-version = {attr = "BirdDMD.__version__"}
+version = {attr = "birddmd.__version__"}
 [project.optional-dependencies]
 test = [
   "pytest >=6",
@@ -45,14 +45,14 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/LydiaFrance/BirdDMD"
-"Bug Tracker" = "https://github.com/LydiaFrance/BirdDMD/issues"
-Discussions = "https://github.com/LydiaFrance/BirdDMD/discussions"
-Changelog = "https://github.com/LydiaFrance/BirdDMD/releases"
+Homepage = "https://github.com/LydiaFrance/birddmd"
+"Bug Tracker" = "https://github.com/LydiaFrance/birddmd/issues"
+Discussions = "https://github.com/LydiaFrance/birddmd/discussions"
+Changelog = "https://github.com/LydiaFrance/birddmd/releases"
 
 
 [tool.hatch]
-version.path = "src/BirdDMD/__init__.py"
+version.path = "src/birddmd/__init__.py"
 envs.default.dependencies = [
   "pytest",
   "pytest-cov",
@@ -71,7 +71,7 @@ testpaths = [
 ]
 
 [tool.coverage]
-run.source = ["BirdDMD"]
+run.source = ["birddmd"]
 port.exclude_lines = [
   'pragma: no cover',
   '\.\.\.',
