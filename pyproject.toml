@@ -25,7 +25,10 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
 ]
-dependencies = ["pydmd",
+dependencies = ["pandas",
+                "numpy",
+                "matplotlib",
+                "pydmd",
                 "ipympl",
                 "jupyter",
                 "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds"]
