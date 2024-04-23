@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = ["pydmd",
                 "ipympl",
+                "jupyter",
                 "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds"]
 [tool.setuptools.dynamic]
 version = {attr = "BirdDMD.__version__"}
