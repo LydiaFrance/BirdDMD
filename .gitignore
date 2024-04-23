@@ -5,6 +5,8 @@ data/results
 data/samples/Flapping*
 data/samples/Initial_9*
 
+examples/phase0/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
