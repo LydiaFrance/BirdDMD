@@ -1,5 +1,5 @@
 """
-BirdDMD: Using DMD on bird wing data. 
+birddmd: Using DMD on bird wing data. 
 """
 from __future__ import annotations
 
