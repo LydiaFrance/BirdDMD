@@ -1,5 +1,9 @@
 # Sensitive Data
 data/raw
+data/processed
+data/results
+data/samples/Flapping*
+data/samples/Initial_9*
 
 
 # Byte-compiled / optimized / DLL files
