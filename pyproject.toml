@@ -31,7 +31,8 @@ dependencies = ["pandas",
                 "pydmd",
                 "ipympl",
                 "jupyter",
-                "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds"]
+                'morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@multi'
+]
 [tool.setuptools.dynamic]
 version = {attr = "birddmd.__version__"}
 [project.optional-dependencies]
