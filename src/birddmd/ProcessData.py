@@ -46,21 +46,25 @@ def get_flight_modes(data):
             # Define the flight behaviours based on the time from 
             # start perch and distance from landing perch
 
-            initial = index & (data['time'] < flight_modes["initial"][birdID][perchDist])
+            initial = index & (data['time'] <= flight_modes["initial"][birdID][perchDist])
             data.loc[initial, 'behaviour'] = "flapping_initial"
 
-            flapping = index & (data['time'] > 0) & (data['time'] < flight_modes["flapping"][birdID][perchDist]) & (data['behaviour']== "") 
+            # 2024-07-09 Adding a second flap boundary definition
+            secondflap = index & (data['time'] <= flight_modes["secondflap"][birdID][perchDist]) & (data['behaviour']== "")
+            data.loc[secondflap, 'behaviour'] = "flapping_second"
+
+            flapping = index & (data['time'] >= 0) & (data['time'] < flight_modes["flapping"][birdID][perchDist]) & (data['behaviour']== "") 
             data.loc[flapping, 'behaviour'] = "flapping"
 
-            gliding = index & (data['time'] > flight_modes["flapping"][birdID][perchDist]) & (-data['HorzDistance'] < flight_modes["landing"][birdID][perchDist])
+            gliding = index & (data['time'] >= flight_modes["flapping"][birdID][perchDist]) & (-data['HorzDistance'] < flight_modes["landing"][birdID][perchDist])
             data.loc[gliding, 'behaviour'] = "gliding"
 
-            landing = index & (-data['HorzDistance'] > flight_modes["landing"][birdID][perchDist])
+            landing = index & (-data['HorzDistance'] >= flight_modes["landing"][birdID][perchDist])
             data.loc[landing, 'behaviour'] = "landing"
 
     return data
 
-def subset_by(data, bird=None, perchDist=None, behaviour=None):
+def subset_by(data, bird=None, perchDist=None, behaviour=None, turn:str ="Straight", year = None):
 
     # If no birdID specified, return all the index
     if bird is None:
@@ -81,6 +85,12 @@ def subset_by(data, bird=None, perchDist=None, behaviour=None):
 
     if behaviour is not None:
         index = index & (data['behaviour'].str.contains(behaviour))
+
+    if turn is not None:
+        index = index & (data['Turn'] == turn)
+
+    if year is not None:
+        index = index & (data['Year'] == year)
 
     marker_column_names, info_column_names = get_column_names(data)
 
@@ -129,6 +139,15 @@ def define_behaviour_boundaries():
                     "ruby":       {"5m": 0.23, "7m": 0.22, "9m": 0.25, "12m": 0.26},
                     "toothless":  {"5m": 0.21, "7m": 0.22, "9m": 0.22, "12m": 0.20},
                     "charmander": {"9m": 0.3}}
+    
+    # 2024-07-09 Subsetting a different section for the first flap
+    # Default to 0.4, if 2 decimal places then it has been looked into properly
+    twoflaps_lims = {"drogon":     {"5m": 0.4, "7m": 0.4, "9m": 0.4, "12m": 0.40},
+                    "rhaegal":     {"5m": 0.4, "7m": 0.4, "9m": 0.4, "12m": 0.40},
+                    "ruby":        {"5m": 0.4, "7m": 0.4, "9m": 0.4, "12m": 0.40},
+                    "toothless":   {"5m": 0.40, "7m": 0.42, "9m": 0.40, "12m": 0.40},
+                    "charmander":  {"9m": 0.4}}
+
 
     flap_dict =     {"drogon":    {"5m": 0.55, "7m": 0.65, "9m": 0.75, "12m": 0.80},
                     "rhaegal":   {"5m": 0.55, "7m": 0.65, "9m": 0.80, "12m": 0.85},
@@ -145,6 +164,7 @@ def define_behaviour_boundaries():
 
     # Store in a dictionary
     flight_modes = {"initial": initial_lims,
+                    "secondflap": twoflaps_lims,
                     "flapping": flap_dict,
                     "landing": landing_lims}
     
