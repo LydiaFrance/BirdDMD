@@ -64,7 +64,8 @@ def run_single_wingbeat_dmd(bird_name: str,
     if verbose:
         print(f"Running DMD for {bird_name}, {perch_dist}m, {turn} turn, seqID: {seqID}")
     
-    average_shape, _ = get_average_shape(marker_column_names)
+    nMarkers=len(marker_column_names)//3
+    average_shape = get_average_shape(nMarkers)
 
     return run_DMD_sequence(seqID = seqID,
                             df = df, 
@@ -117,13 +118,14 @@ def dmd_loop_seqs(bird_name,
     plt.show()
 
 
-    average_shape, _ = get_average_shape(marker_column_names)
+    nMarkers=len(marker_column_names)//3
+    average_shape = get_average_shape(nMarkers)
 
     df = remove_time_duplicates(df)
 
     for seqID in df['seqID'].unique():
 
-        times, markers, Lambda, Modes, bn, Psi, keypoints = run_DMD_sequence(seqID, df, marker_column_names, average_shape, n_Modes, min_seq_length, eig_constraints, d)
+        times, markers, Lambda, Modes, bn, Psi, phase_shifts, dmd_results, keypoints = run_DMD_sequence(seqID, df, marker_column_names, average_shape, n_Modes, min_seq_length, eig_constraints, d)
         # TODO 2024-07-08 21:41 Maybe fix this, split into two steps to check size
         if times is not None:
             save_sequence_results(save_path, 
@@ -171,9 +173,10 @@ def run_DMD_sequence(seqID:str,
     markers, times = load_sequence_data(df, seqID, marker_column_names)
 
     if average_shape is None:
-        average_shape, num_markers = get_average_shape(marker_column_names)
+        nMarkers=len(marker_column_names)//3
+        average_shape = get_average_shape(nMarkers)
     else:
-        num_markers = average_shape.shape[1]//3
+        num_markers = average_shape.shape[1]
 
 
     if min_seq_length == None:
@@ -189,7 +192,7 @@ def run_DMD_sequence(seqID:str,
         times, markers = spline_interpolation(times, markers)
 
 
-    normalised_markers, _ = normalise_data(markers, average_shape)
+    normalised_markers, _ = normalise_data(markers)
 
     dmd_results, _ = perform_dmd(normalised_markers, times, n_Modes, eig_constraints=eig_constraints, d=d)
     
@@ -209,7 +212,7 @@ def run_DMD_sequence(seqID:str,
 
     markers = markers.reshape(-1, num_markers, 3)
 
-    return times, markers, Lambda, Modes, bn, Psi, phase_shifts, keypoints
+    return times, markers, Lambda, Modes, bn, Psi, phase_shifts, dmd_results,  keypoints
 
 
 
@@ -358,40 +361,55 @@ def load_sequence_data(df, seqID, marker_column_names):
     times = df[condition]['time'].to_numpy().astype(np.float64)
     return markers, times
 
-def get_average_shape(marker_column_names):
+def get_average_shape(nMarkers):
     """
     Loads the mean hawk shape from a standard file based on the number of markers.
 
     Parameters:
-        marker_column_names: List of marker columns to infer the number of markers (4 or 8).
+        nMarkers: The number of markers (4 or 8).
 
     Returns:
         average_shape: The mean shape as a (1, n_coords) NumPy array.
         nMarkers: The number of markers (4 or 8).
     """
-    nMarkers = len(marker_column_names)//3
     hawk3d = Hawk3D("../data/mean_hawk_shape.csv")
     if nMarkers == 8:
-        return hawk3d.markers.reshape(24,1).T, nMarkers
+        return hawk3d.markers
     elif nMarkers == 4:
-        return hawk3d.right_markers.reshape(12,1).T, nMarkers
+        return hawk3d.right_markers
     else:
         raise ValueError("Expected 4 markers or 8 (12 or 24 coordinates) but got {nMarkers} markers.")
     
 
-def normalise_data(markers, average_shape):
+def normalise_data(markers):
     """
     Center the marker data by subtracting the average shape.
 
     Parameters:
-        markers: Marker data array (n_frames, n_coords).
-        average_shape: The mean shape (1, n_coords).
+        markers: Marker data array (n_frames, n_coords*n_markers).
+        average_shape: The mean shape (1, n_coords*n_markers).
 
     Returns:
         normalized_markers: Centered marker data.
         average_shape: The average shape passed in (for convenience).
     """
-    return markers - average_shape, average_shape
+    if len(markers.shape) == 3:
+        nMarkers = markers.shape[1]
+        average_shape = get_average_shape(nMarkers)
+        return markers - average_shape, average_shape
+
+
+    elif len(markers.shape) == 2:
+        nMarkers = markers.shape[1]//3
+        average_shape = get_average_shape(nMarkers)
+        return markers - average_shape.reshape(1, -1), average_shape
+
+    else:
+        raise ValueError("Expected 2D or 3D marker data but got shape", markers.shape)
+    
+
+
+
 
 
 def add_average_shape(data, average_shape):
@@ -496,6 +514,7 @@ def run_forecast(dmd_results, times, average_shape, num_markers):
                    # Frame adjustment note removed for clarity, handled below if needed
     """
     n_coords = num_markers*3
+    print(f"n_coords: {n_coords}")
     # Pass the imaginary part of eigenvalues as omega (frequencies)
     reconstruction = reconstruct_dmd(times,
                                    np.imag(dmd_results.eigs), # Pass frequencies
@@ -504,8 +523,13 @@ def run_forecast(dmd_results, times, average_shape, num_markers):
 
     # Add mean shape and reshape
     # Ensure reconstruction shape is (n_times, n_coords) before adding mean shape
+    average_shape = average_shape.reshape(1, -1)
     if reconstruction.shape[1] != average_shape.shape[1]:
-         raise ValueError(f"Shape mismatch: Reconstruction ({reconstruction.shape}) vs Average Shape ({average_shape.shape})")
+        print(f"Reconstruction shape: {reconstruction.shape}")
+        print(f"Average shape shape: {average_shape.shape}")
+        raise ValueError(f"Shape mismatch: Reconstruction ({reconstruction.shape}) vs Average Shape ({average_shape.shape})")
+    
+    
     forecast_plus_mean = reconstruction + average_shape # Broadcasting
     keypoints = reshape_data(forecast_plus_mean, -1, num_markers, 3) # Use reshape_data
 
@@ -545,6 +569,7 @@ def reorder_dmd_results(dmd_results, num_markers, nModes):
     Psi = dmd_results.modes
     Psi = Psi[:num_markers*3, bn]
 
+    
     # Fixes the sign of the phase shift
     omega = np.imag(dmd_results.eigs)
     sign_omega = np.sign(omega)
@@ -560,11 +585,98 @@ def reorder_dmd_results(dmd_results, num_markers, nModes):
 
     # Get eigenvalues and reorder
     Lambda = dmd_results.eigs[bn]
-    
     # Reshape modes into (markers, coordinates, modes) format
     Modes = mode_magnitudes.reshape(num_markers, 3, nModes)
 
     return np.imag(Lambda), Modes, dmd_results.amplitudes[bn], Psi, phase_shifts
+
+
+
+def plot_amplitude_ranking(
+    markers,
+    times,
+    max_modes=20,
+    d=2,
+    eig_constraints={"conjugate_pairs"}, # Default to notebook example
+    figsize=(6, 2)
+):
+    """
+    Runs DMD with a specified maximum number of modes and plots the
+    sorted absolute amplitudes to help determine an appropriate rank.
+
+    This is useful for visually inspecting the decay of mode amplitudes
+    to choose the `n_modes` parameter for main DMD runs.
+
+    Parameters:
+        markers: Marker data
+        times: Time vector corresponding to markers.
+        max_modes: The maximum rank (number of modes) to compute.
+        d: Hankel matrix delay parameter.
+        eig_constraints: Constraints for BOPDMD eigenvalues.
+        figsize: Size of the output plot.
+
+    Returns:
+        fig: Matplotlib figure object.
+        ax: Matplotlib axes object.
+        sorted_amplitudes: NumPy array of sorted absolute amplitudes (descending).
+    """
+    # Input validation
+    if times.shape[0] != markers.shape[0]:
+        raise ValueError("Shape mismatch: `times` and `markers` must have the same number of frames.")
+    # Check if enough data points exist for the requested modes and delay
+    required_steps = max_modes + d # Minimum steps needed for Hankel matrix construction and SVD
+    if markers.shape[0] <= required_steps:
+        raise ValueError(f"Not enough time steps ({markers.shape[0]}) to compute "
+                         f"{max_modes} modes with delay d={d}. Need > {required_steps}.")
+
+    # Transpose data for DMD fit (coords, time)
+    normalised_markers, _ = normalise_data(markers)
+    reshaped_markers = normalised_markers.reshape(markers.shape[0], -1)
+    transposed_markers = reshaped_markers.T
+
+    # Setup and fit DMD model
+    print(f"Fitting DMD with max_modes={max_modes}, d={d}...")
+    dmd_model = hankel_preprocessing(
+        BOPDMD(svd_rank=max_modes, eig_constraints=eig_constraints),
+        d=d
+    )
+    # Use times[1:] for fitting, consistent with other functions
+    dmd_model.fit(transposed_markers, t=times[1:])
+    print("DMD fit complete.")
+
+    # Get computed amplitudes (complex values)
+    amplitudes = dmd_model.amplitudes
+
+    if amplitudes is None or len(amplitudes) == 0:
+         print("Warning: DMD fit did not produce amplitudes.")
+         # Create an empty plot or handle as needed
+         fig, ax = plt.subplots(figsize=figsize)
+         ax.text(0.5, 0.5, 'No amplitudes found', ha='center', va='center')
+         return fig, ax, np.array([])
+
+    # Calculate absolute amplitudes and sort descending
+    abs_amplitudes = np.abs(amplitudes)
+    # Argsort returns indices for ascending order, use [::-1] for descending
+    sort_indices = np.argsort(abs_amplitudes)[::-1]
+    sorted_amplitudes = abs_amplitudes[sort_indices]
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=figsize)
+    # Ranks should go from 0 to number of modes found - 1
+    ranks = np.arange(len(sorted_amplitudes))
+    ax.scatter(ranks, sorted_amplitudes, marker='o', s=15) # Adjust marker/size
+    ax.set_ylabel(r"Amplitude $|\beta|$") # Use standard notation if preferred
+    ax.set_xlabel("DMD Mode Rank (Sorted by Amplitude)")
+    ax.set_title(f"DMD Mode Amplitude Ranking (max_modes={max_modes})")
+    ax.grid(True, linestyle='--', alpha=0.6)
+    ax.tick_params(axis='both', which='major', labelsize=8)
+    # Optional: set xlim to show all potential ranks up to max_modes?
+    # ax.set_xlim(-0.5, max_modes - 0.5)
+
+    fig.tight_layout()
+
+    return fig, ax, sorted_amplitudes
+
 
 # ------------- Reconstructing Modes ------------- 
 

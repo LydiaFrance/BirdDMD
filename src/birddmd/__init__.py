@@ -11,7 +11,7 @@ from .runDMD import (
     get_average_shape, normalise_data, add_average_shape, reshape_data,
     perform_dmd, run_forecast, reorder_dmd_results, reconstruct_dmd,
     reconstruct_specific_modes, make_unilateral_keypoints, project_into_pca_space,
-    create_scores_info_df, 
+    create_scores_info_df, plot_amplitude_ranking,
     save_sequence_results, load_sequence_results, load_dmd_results)
 
 from .aggregateDMD import get_every_sequence_result, plot_aggregate_DMD_histogram
@@ -26,5 +26,5 @@ __all__ = ("__version__", "replace_rot_xyz_name", "get_flight_modes",
            "reconstruct_dmd", "reconstruct_specific_modes", "make_unilateral_keypoints",
            "project_into_pca_space", "create_scores_info_df", "save_sequence_results", 
            "load_sequence_results", "load_dmd_results", "get_every_sequence_result", 
-           "plot_aggregate_DMD_histogram")
+           "plot_aggregate_DMD_histogram", "plot_amplitude_ranking")
 __version__ = "0.1.0"
