@@ -1,12 +1,10 @@
 # Sensitive Data
-data/raw
-data/processed
-data/results
-data/samples/Flapping*
-data/samples/Initial_9*
+data/
 
 examples/phase0/
+examples/unknownfiles/
 
+notneededref/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
