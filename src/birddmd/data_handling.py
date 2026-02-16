@@ -181,7 +181,7 @@ def load_bird_data(bird_name: str,
         raise ValidationError(f"Error loading data: {str(e)}")
 
 
-def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID') -> pd.DataFrame:
+def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID', verbose: bool = False) -> pd.DataFrame:
     """
     Removes duplicate rows based on a column (typically 'frameID').
 
@@ -197,7 +197,8 @@ def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID') -> pd
     ratio_duplicates = (duplicates.shape[0] / df.shape[0]) * 100
     
     # Report percentage of duplicates
-    print(f"Duplicated frames are {np.round(ratio_duplicates, 2)}% of the total data.")
+    if verbose and ratio_duplicates > 0:
+        print(f"Duplicated frames are {np.round(ratio_duplicates, 2)}% of the total data.")
     
     # Remove duplicates
     df = df.drop_duplicates(subset=[column_name], keep='first')
@@ -206,6 +207,7 @@ def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID') -> pd
     df = df.reset_index(drop=True)
     
     return df
+
 
 def load_sequence_data(df: pd.DataFrame, seqID: str, marker_column_names: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
