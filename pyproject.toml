@@ -92,6 +92,7 @@ select = [
 ]
 ignore = [
   "PLR",    # design-related pylint codes
+  "PLR0913", # Too many arguments
   "ISC001", # conflicts with formatter
 ]
 
