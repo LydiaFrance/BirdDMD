@@ -121,10 +121,9 @@ def _compute_dmd(
 def reorder_dmd_results(
     dmd_results: BOPDMD,
     num_markers: int,
-    n_modes: int,
     order_by: str = "amplitude",
     reshape_modes: bool = True,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Reorder DMD results by amplitude or frequency.
 
     Args:
@@ -135,7 +134,7 @@ def reorder_dmd_results(
         reshape_modes: Whether to reshape modes for marker data
 
     Returns:
-        Tuple of (Lambda, Modes, bn, Psi, phase_shifts)
+        Tuple of (Lambda, Modes, bn, Psi, phase_shifts, sort_idx)
 
     Raises:
         ValueError: If order_by is invalid
@@ -155,15 +154,18 @@ def reorder_dmd_results(
 
     # Get and reorder modes
     Psi = dmd_results.modes
-    n_vars = num_markers if not reshape_modes else num_markers * 3
+    n_vars = num_markers if not reshape_modes else num_markers * DIMENSION_3D
     Psi = Psi[:n_vars, sort_idx]
+
+    # Get actual number of modes from the data
+    actual_n_modes = Psi.shape[1]
+
+    mode_magnitudes = np.sqrt(np.real(Psi) ** 2 + np.imag(Psi) ** 2)
 
     # Handle marker data vs time series data
     if reshape_modes and num_markers <= MARKER_RESHAPE_THRESHOLD:  # Marker data case
-        mode_magnitudes = np.sqrt(np.real(Psi) ** 2 + np.imag(Psi) ** 2)
-        Modes = mode_magnitudes.reshape(num_markers, 3, n_modes)
+        Modes = mode_magnitudes.reshape(num_markers, DIMENSION_3D, actual_n_modes)
     else:  # Time series case
-        mode_magnitudes = np.sqrt(np.real(Psi) ** 2 + np.imag(Psi) ** 2)
         Modes = mode_magnitudes
 
     # Reorder other components
@@ -171,7 +173,7 @@ def reorder_dmd_results(
     bn = dmd_results.amplitudes[sort_idx]
     phase_shifts = np.arctan2(-sign_omega[sort_idx] * np.imag(Psi), np.real(Psi))
 
-    return Lambda, Modes, bn, Psi, phase_shifts
+    return Lambda, Modes, bn, Psi, phase_shifts, sort_idx
 
 
 def run_dmd(
