@@ -43,7 +43,12 @@ MARKER_RESHAPE_THRESHOLD = 8
 
 
 def _compute_dmd(
-    data: np.ndarray, times: np.ndarray, n_modes: int, eig_constraints: set[str], d: int
+    data: np.ndarray,
+    times: np.ndarray,
+    n_modes: int,
+    eig_constraints: set[str],
+    d: int,
+    debug: bool = False,
 ) -> tuple[BOPDMD | None, np.ndarray]:
     """Compute DMD on preprocessed data.
 
@@ -53,7 +58,7 @@ def _compute_dmd(
         n_modes: Number of DMD modes to compute
         eig_constraints: Constraints for BOPDMD eigenvalues
         d: Hankel matrix delay parameter
-
+        debug: Whether to print debug information
     Returns:
         Tuple of (dmd_results, processed_data)
         dmd_results is None if computation fails
@@ -62,21 +67,22 @@ def _compute_dmd(
         ComputationError: If DMD computation fails
     """
     try:
-        # Debug prints
-        print("\nDMD Execution Debug:")
-        print(f"Data shape: {data.shape}")
-        print(f"Times shape: {times.shape}")
-        print(f"Number of modes: {n_modes}")
-        print(f"Eigenvalue constraints: {eig_constraints}")
-        print(f"Delay parameter d: {d}")
-        print(f"Data min/max: {np.min(data):.3f}/{np.max(data):.3f}")
-        print(f"Times min/max: {np.min(times):.3f}/{np.max(times):.3f}")
+        if debug:
+            # Debug prints
+            print("\nDMD Execution Debug:")
+            print(f"Data shape: {data.shape}")
+            print(f"Times shape: {times.shape}")
+            print(f"Number of modes: {n_modes}")
+            print(f"Eigenvalue constraints: {eig_constraints}")
+            print(f"Delay parameter d: {d}")
+            print(f"Data min/max: {np.min(data):.3f}/{np.max(data):.3f}")
+            print(f"Times min/max: {np.min(times):.3f}/{np.max(times):.3f}")
 
         # Ensure data is in correct shape (n_variables, n_timesteps)
         if data.shape[0] > data.shape[1]:
             data = data.T
 
-        # Initialize and fit BOPDMD
+        # Initialise and fit BOPDMD
         dmd = hankel_preprocessing(
             BOPDMD(svd_rank=n_modes, eig_constraints=eig_constraints), d=d
         )
@@ -85,14 +91,25 @@ def _compute_dmd(
         if len(times) != data.shape[1]:
             times = times[: data.shape[1]]
 
-        print(f"Time size: {times.shape}")
-        print(f"Data shape: {data.shape}")
+        if debug:
+            print(f"Time size: {times.shape}")
+            print(f"Data shape: {data.shape}")
 
-        print("\nFitting DMD...")
+        # Check time vector is strictly increasing and unique
+        dt = np.mean(np.diff(times))
+        if np.any(dt <= 0):
+            msg = "Time vector must be strictly increasing and unique"
+            raise ValidationError(msg)
+
+        if debug:
+            print("\nFitting DMD...")
+
         dmd.fit(data, t=times[1:])  # Use times[1:] for fitting
-        print("DMD fit complete")
-        print(f"Number of eigenvalues: {len(dmd.eigs)}")
-        print(f"Eigenvalues: {np.round(dmd.eigs, 3)}")
+
+        if debug:
+            print("DMD fit complete")
+            print(f"Number of eigenvalues: {len(dmd.eigs)}")
+            print(f"Eigenvalues: {np.round(dmd.eigs, 3)}")
 
         return dmd, data
 
