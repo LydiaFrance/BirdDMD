@@ -81,7 +81,9 @@ def validate_times(times: np.ndarray, n_frames: int) -> np.ndarray:
         
     return times
 
-def validate_average_shape(avg_shape: np.ndarray, n_coords: int, is_timeseries: bool = False) -> np.ndarray:
+def validate_average_shape(avg_shape: np.ndarray, 
+                           n_coords: int, 
+                           is_timeseries: bool = False) -> np.ndarray:
     """Validate average shape dimensions.
     
     Args:
@@ -122,7 +124,7 @@ def load_bird_data(bird_name: str,
         perch_distance: Perch distance (e.g., '9m'). If None, assumes filename doesn't specify distance
         bilateral: 'Bilateral' or 'Unilateral'
         turn: Turn direction ('Straight', 'Left', 'Right')
-
+        verbose: Whether to print verbose output about dataframe shape and number of sequences  
     Returns:
         Tuple of (wingbeat_df, marker_column_names)
 
@@ -181,13 +183,16 @@ def load_bird_data(bird_name: str,
         raise ValidationError(f"Error loading data: {str(e)}")
 
 
-def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID', verbose: bool = False) -> pd.DataFrame:
+def remove_time_duplicates(df: pd.DataFrame, 
+                           column_name: str = 'frameID', 
+                           verbose: bool = False) -> pd.DataFrame:
     """
     Removes duplicate rows based on a column (typically 'frameID').
 
     Args:
         df: Input DataFrame
         column_name: Column to check for duplicates
+        verbose: Whether to print the percentage of duplicates found
 
     Returns:
         DataFrame with duplicates removed and index reset
@@ -209,7 +214,9 @@ def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID', verbo
     return df
 
 
-def load_sequence_data(df: pd.DataFrame, seqID: str, marker_column_names: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def load_sequence_data(df: pd.DataFrame, 
+                       seqID: str, 
+                       marker_column_names: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Extracts marker coordinates and timestamps for a specific seqID from the main DataFrame.
 
@@ -227,7 +234,8 @@ def load_sequence_data(df: pd.DataFrame, seqID: str, marker_column_names: np.nda
     times = df[condition]['time'].to_numpy().astype(np.float64)
     return markers, times
 
-def get_average_shape(nMarkers: int, mean_shape_path: Optional[str] = None) -> np.ndarray:
+def get_average_shape(nMarkers: int, 
+                      mean_shape_path: Optional[str] = None) -> np.ndarray:
     """
     Loads the mean hawk shape from a standard file based on the number of markers.
 
@@ -254,7 +262,7 @@ def get_average_shape(nMarkers: int, mean_shape_path: Optional[str] = None) -> n
 
 def normalise_data(markers: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Center the marker data by subtracting the average shape.
+    Centre the marker data by subtracting the average shape.
 
     Args:
         markers: Marker data array (n_frames, n_coords*n_markers)
@@ -291,7 +299,10 @@ def add_average_shape(data: np.ndarray, average_shape: np.ndarray) -> np.ndarray
     """
     return data + average_shape
 
-def reshape_data(data: np.ndarray, n_frames: int, n_markers: int, n_dims: int = 3) -> np.ndarray:
+def reshape_data(data: np.ndarray, 
+                 n_frames: int, 
+                 n_markers: int, 
+                 n_dims: int = 3) -> np.ndarray:
     """
     Reshape flattened marker data into (frames, markers, dimensions).
 
