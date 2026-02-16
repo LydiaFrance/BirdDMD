@@ -20,7 +20,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: stable
+    rev: "v0.15.1"
     hooks:
       # 1) fix-only hook: run ruff with only the fixable rule set (exclude F401/F841)
       - id: ruff
