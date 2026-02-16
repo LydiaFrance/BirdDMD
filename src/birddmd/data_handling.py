@@ -323,7 +323,8 @@ def reshape_data(data: np.ndarray,
     except ValueError as e:
         raise ShapeError(f"Cannot reshape data of shape {data.shape} to ({n_frames}, {n_markers}, {n_dims}): {str(e)}")
 
-def spline_interpolation(times: np.ndarray, markers: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def spline_interpolation(times: np.ndarray, 
+                         markers: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Perform cubic spline interpolation if time steps are uneven.
 
