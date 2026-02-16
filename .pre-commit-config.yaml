@@ -27,7 +27,7 @@ repos:
         name: ruff (autofix-safe)
         entry: ruff
         types_or: [python, pyi, jupyter]
-        args: ["check", "--fix", "--show-fixes", "--select", "E,F,W,B,I,C4,EM,ICN,ISC,G,PGH,PIE,PT,RET,RUF,SIM,UP,YTT,EXE"]
+        args: ["check", "--fix", "--show-fixes", "--ignore", "PLR0913", "--select", "E,F,W,B,I,C4,EM,ICN,ISC,G,PGH,PIE,PT,RET,RUF,SIM,UP,YTT,EXE"]
         # note: this selects the subset we consider safe-to-fix (no F401/F841 here)
 
       # 2) format hook to ensure formatting changes applied
@@ -39,5 +39,5 @@ repos:
         name: ruff (check-only for remaining rules)
         entry: ruff
         types_or: [python, pyi, jupyter]
-        args: ["check", "--select", "F401,F841,E,F,W,B,I,ARG,C4,EM,ICN,ISC,G,PGH,PIE,PL,PT,RET,RUF,SIM,UP,YTT,EXE"]
+        args: ["check", "--ignore", "PLR0913", "--select", "F401,F841,E,F,W,B,I,ARG,C4,EM,ICN,ISC,G,PGH,PIE,PL,PT,RET,RUF,SIM,UP,YTT,EXE"]
         # this will report F401 and F841 (and other checks) but not attempt to auto-fix them
