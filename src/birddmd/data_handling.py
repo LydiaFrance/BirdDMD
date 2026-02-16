@@ -106,11 +106,13 @@ def validate_average_shape(avg_shape: np.ndarray, n_coords: int, is_timeseries: 
         
     return avg_shape
 
+
 def load_bird_data(bird_name: str, 
                    behaviour: str, 
                    perch_distance: Optional[str] = None, 
                    bilateral: str = "Bilateral", 
-                   turn: str = "Straight") -> Tuple[pd.DataFrame, np.ndarray]:
+                   turn: str = "Straight", 
+                   verbose: bool = False) -> Tuple[pd.DataFrame, np.ndarray]:
     """
     Load bird marker and info data into a DataFrame based on specified parameters.
 
@@ -167,8 +169,9 @@ def load_bird_data(bird_name: str,
         n_sequences = wingbeat_df["seqID"].nunique()
 
         # Report the loaded DataFrame size
-        print(f"Loading {bird_name} {bilateral_status.lower()} data with {perch_distance_text} perch distances{turn_text}, {behaviour.lower()}.")
-        print(f"Dataframe with shape {wingbeat_df.shape} loaded. Number of sequences: {n_sequences}")
+        if verbose:
+            print(f"Loading {bird_name} {bilateral_status.lower()} data with {perch_distance_text} perch distances{turn_text}, {behaviour.lower()}.")
+            print(f"Dataframe with shape {wingbeat_df.shape} loaded. Number of sequences: {n_sequences}")
         
         return wingbeat_df, marker_column_names
 
@@ -176,6 +179,7 @@ def load_bird_data(bird_name: str,
         raise FileNotFoundError(f"Data file not found: {file_path}")
     except Exception as e:
         raise ValidationError(f"Error loading data: {str(e)}")
+
 
 def remove_time_duplicates(df: pd.DataFrame, column_name: str = 'frameID') -> pd.DataFrame:
     """
