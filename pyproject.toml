@@ -1,9 +1,10 @@
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
+
 [project]
 name = "birddmd"
-version = "0.1.0"  # need to also update version in src/birddmd/__init__.py
+dynamic = ["version"]
 authors = [
   { name = "Lydia France", email = "lfrance@turing.ac.uk" },
 ]
@@ -19,22 +20,24 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
 ]
-dependencies = ["pandas",
-                "numpy",
-                "matplotlib",
-                "pydmd",
-                "ipympl",
-                "jupyter",
-                'morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@multi'
+dependencies = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "pydmd",
+    "ipympl",
+    "jupyter",
+    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@multi"
 ]
+
 [tool.setuptools.dynamic]
 version = {attr = "birddmd.__version__"}
+
 [project.optional-dependencies]
 test = [
   "pytest >=6",
@@ -50,14 +53,6 @@ Homepage = "https://github.com/LydiaFrance/birddmd"
 "Bug Tracker" = "https://github.com/LydiaFrance/birddmd/issues"
 Discussions = "https://github.com/LydiaFrance/birddmd/discussions"
 Changelog = "https://github.com/LydiaFrance/birddmd/releases"
-
-
-[tool.hatch]
-version.path = "src/birddmd/__init__.py"
-envs.default.dependencies = [
-  "pytest",
-  "pytest-cov",
-]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -80,45 +75,50 @@ port.exclude_lines = [
   'if typing.TYPE_CHECKING:',
 ]
 
-
-
 [tool.ruff]
+# where to look for source
 src = ["src"]
-exclude = []
-line-length = 88  # how long you want lines to be
+exclude = ["build", "dist", "generated/**"]
+line-length = 88
 
 [tool.ruff.format]
-docstring-code-format = true  # code snippets in docstrings will be formatted
+docstring-code-format = true
 
 [tool.ruff.lint]
 select = [
-  "E", "F", "W", # flake8
-  "B",           # flake8-bugbear
-  "I",           # isort
-  "ARG",         # flake8-unused-arguments
-  "C4",          # flake8-comprehensions
-  "EM",          # flake8-errmsg
-  "ICN",         # flake8-import-conventions
-  "ISC",         # flake8-implicit-str-concat
-  "G",           # flake8-logging-format
-  "PGH",         # pygrep-hooks
-  "PIE",         # flake8-pie
-  "PL",          # pylint
-  "PT",          # flake8-pytest-style
-  "RET",         # flake8-return
-  "RUF",         # Ruff-specific
-  "SIM",         # flake8-simplify
-  "UP",          # pyupgrade
-  "YTT",         # flake8-2020
-  "EXE",         # flake8-executable
+  "E", "F", "W",
+  "B", "I", "ARG", "C4", "EM", "ICN", "ISC", "G",
+  "PGH", "PIE", "PL", "PT", "RET", "RUF", "SIM", "UP", "YTT", "EXE",
 ]
 ignore = [
-  "PLR",    # Design related pylint codes
-  "ISC001", # Conflicts with formatter
+  "PLR",    # design-related pylint codes
+  "ISC001", # conflicts with formatter
 ]
-unfixable = [
-  "F401",   # Would remove unused imports
-  "F841",   # Would remove unused variables
-]
-flake8-unused-arguments.ignore-variadic-names = true  # allow unused *args/**kwargs
 
+# Per-file relaxations
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "S"]         # docstring + security relaxed for tests
+"notebooks/**" = ["I", "E501"]  # ignore import-order and long lines in notebooks
+"scripts/**" = ["D"]             # scripts can be more permissive
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ty]
+# main configuration section
+
+[tool.ty.rules]
+# start with warnings locally so pre-commit shows issues without blocking commits
+all = "warn"
+# example: silence UNUSED-IMPORT rule if it's noisy, otherwise leave for checks
+# unused-import = "ignore"
+
+[tool.ty.analysis]
+allowed-unresolved-imports = ["tests.**", "third_party.**"]
+respect-type-ignore-comments = true
+
+# make tests more permissive
+[[tool.ty.overrides]]
+include = ["tests/**", "**/test_*.py"]
+[tool.ty.overrides.rules]
+possibly-unresolved-reference = "warn"
