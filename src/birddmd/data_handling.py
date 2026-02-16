@@ -346,3 +346,52 @@ def spline_interpolation(times: np.ndarray,
         new_markers[:, i] = cs(new_times)
 
     return new_times, new_markers
+
+def bin_dataframe_means(dataframe: pd.DataFrame,
+                        x_axis: str = 'HorzDistance',
+                        bin_size: float = 0.01) -> pd.DataFrame:
+    """
+    Bin a DataFrame along a specified axis and return mean values per bin.
+
+    Groups the data into bins of the given size along ``x_axis``, then
+    computes the mean of every numeric column in each bin.  Object columns
+    are carried forward using the first value per bin.  The resulting
+    DataFrame has a ``time`` column set to the bin centres and a constant
+    ``seqID`` of ``"binned"``.
+
+    Args:
+        dataframe: Input DataFrame to be binned
+        x_axis: Column name to use for binning (e.g., 'HorzDistance')
+        bin_size: Size of each bin along the x_axis
+    Returns:
+        DataFrame with one row per bin centre, containing mean values
+        for each numeric column.
+    """
+    x_min = dataframe[x_axis].min()
+    x_max = dataframe[x_axis].max()
+    bins = np.arange(x_min, x_max + bin_size, bin_size)
+    bins = np.around(bins,3)  # Round to avoid floating point issues
+    bin_centres = bins[:-1] + bin_size / 2
+
+    # Assign each row to a bin
+    dataframe_copy = dataframe.copy()
+    dataframe_copy['bin'] = pd.cut(dataframe_copy[x_axis], 
+                                   bins=bins, right = False, include_lowest=True)
+    
+    dataframe_copy["HorzDistance"] = dataframe_copy["HorzDistance"].astype(float)
+    dataframe_copy["VertDistance"] = dataframe_copy["VertDistance"].astype(float)
+
+    # Group by bin and calculate mean for all numeric columns
+    #   -- if categorical columns are present, they will be ignored in the mean calculation
+    grouped = dataframe_copy.groupby('bin', observed=True).mean(numeric_only=True)
+
+    # For object (aka categorical) columns, take the first value in each bin
+    object_cols = dataframe_copy.select_dtypes(include=['object']).columns
+    for col in object_cols:
+        grouped[col] = dataframe_copy.groupby('bin', observed=True)[col].first()
+
+    # Set the time column to the bin centres and seqID to "binned"
+    grouped['time'] = bin_centres[:len(grouped)]
+    grouped['seqID'] = "binned"
+
+    return grouped
