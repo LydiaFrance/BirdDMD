@@ -27,7 +27,7 @@ repos:
         name: ruff (autofix-safe)
         entry: ruff
         types_or: [python, pyi, jupyter]
-        args: ["--fix", "--show-fixes", "--select", "E,F,W,B,I,C4,EM,ICN,ISC,G,PGH,PIE,PT,RET,RUF,SIM,UP,YTT,EXE"]
+        args: ["check", "--fix", "--show-fixes", "--select", "E,F,W,B,I,C4,EM,ICN,ISC,G,PGH,PIE,PT,RET,RUF,SIM,UP,YTT,EXE"]
         # note: this selects the subset we consider safe-to-fix (no F401/F841 here)
 
       # 2) format hook to ensure formatting changes applied
