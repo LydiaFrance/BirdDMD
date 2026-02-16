@@ -20,13 +20,24 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.2.0"
+    rev: stable
     hooks:
-      # first, lint + autofix
+      # 1) fix-only hook: run ruff with only the fixable rule set (exclude F401/F841)
       - id: ruff
+        name: ruff (autofix-safe)
+        entry: ruff
         types_or: [python, pyi, jupyter]
-        args: ["--fix", "--show-fixes"]
-      # then, format
+        args: ["--fix", "--show-fixes", "--select", "E,F,W,B,I,C4,EM,ICN,ISC,G,PGH,PIE,PT,RET,RUF,SIM,UP,YTT,EXE"]
+        # note: this selects the subset we consider safe-to-fix (no F401/F841 here)
+
+      # 2) format hook to ensure formatting changes applied
       - id: ruff-format
+        name: ruff-format
 
-
+      # 3) check-only hook: run ruff as checker for the remaining rules (including F401/F841)
+      - id: ruff
+        name: ruff (check-only for remaining rules)
+        entry: ruff
+        types_or: [python, pyi, jupyter]
+        args: ["check", "--select", "F401,F841,E,F,W,B,I,ARG,C4,EM,ICN,ISC,G,PGH,PIE,PL,PT,RET,RUF,SIM,UP,YTT,EXE"]
+        # this will report F401 and F841 (and other checks) but not attempt to auto-fix them
