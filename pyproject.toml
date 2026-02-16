@@ -104,6 +104,9 @@ ignore = [
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true
 
+[tool.ruff.lint.pylint]
+max-args = 7
+
 [tool.ty]
 # main configuration section
 
