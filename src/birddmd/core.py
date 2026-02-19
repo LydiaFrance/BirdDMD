@@ -1,3 +1,4 @@
+# ruff: noqa: RUF001, RUF002
 """Core DMD analysis: fitting, result packaging, and convergence.
 
 This module contains the central ``run_dmd`` entry point, the
@@ -159,9 +160,8 @@ class DMDResult:
         indices = []
         for pair in pair_numbers:
             if pair < 0 or pair >= len(self.conjugate_pairs):
-                raise ValueError(
-                    f"Pair {pair} out of range [0, {len(self.conjugate_pairs) - 1}]"
-                )
+                msg = f"Pair {pair} out of range [0, {len(self.conjugate_pairs) - 1}]"
+                raise ValueError(msg)
             ii, jj = self.conjugate_pairs[pair]
             indices.append(ii)
             if ii != jj:
@@ -258,7 +258,7 @@ def _fit_bopdmd(
     RuntimeError
         If the BOPDMD fit fails.
     """
-    kwargs: dict[str, Any] = dict(svd_rank=n_modes, eig_constraints=eig_constraints)
+    kwargs: dict[str, Any] = {"svd_rank": n_modes, "eig_constraints": eig_constraints}
     if init_alpha is not None:
         kwargs["init_alpha"] = init_alpha
 
@@ -266,12 +266,14 @@ def _fit_bopdmd(
 
     dt = np.diff(times)
     if np.any(dt <= 0):
-        raise ValueError("Time vector must be strictly increasing")
+        msg = "Time vector must be strictly increasing"
+        raise ValueError(msg)
 
     try:
         dmd.fit(data, t=times[1:])
     except Exception as exc:
-        raise RuntimeError(f"BOPDMD fit failed: {exc}") from exc
+        msg = f"BOPDMD fit failed: {exc}"
+        raise RuntimeError(msg) from exc
 
     return dmd
 
@@ -296,8 +298,8 @@ def _reorder_by_amplitude(dmd: Any, n_markers: int, n_spatial_dims: int = 3):
     magnitudes = np.abs(modes)
     mode_magnitudes = magnitudes.reshape(n_markers, n_spatial_dims, -1)
 
-    # Phase shifts — θ = arctan2(−sign(ω) · Im(φ), Re(φ))
-    # phase = arctan2(−sign(ω) · Im(φ), Re(φ))  [phasor notation]
+    # Phase shifts — θ = arctan2(-sign(ω) · Im(φ), Re(φ))
+    # phase = arctan2(-sign(ω) · Im(φ), Re(φ))  [phasor notation]
     phase_shifts = np.arctan2(-sign_omega[sort_idx] * np.imag(modes), np.real(modes))
 
     frequencies_hz = frequencies_sorted / (2 * np.pi)
@@ -413,18 +415,17 @@ def run_dmd(
     if times is None:
         times = np.arange(n_frames, dtype=float)
     if len(times) != n_frames:
-        raise ValueError(
-            f"Time vector length ({len(times)}) != frame count ({n_frames})"
-        )
+        msg = f"Time vector length ({len(times)}) != frame count ({n_frames})"
+        raise ValueError(msg)
 
     if average_shape is None:
-        raise ValueError("average_shape must be provided for marker data")
+        msg = "average_shape must be provided for marker data"
+        raise ValueError(msg)
 
     avg_flat = average_shape.reshape(1, -1)
     if avg_flat.shape[1] != n_coords:
-        raise ValueError(
-            f"average_shape has {avg_flat.shape[1]} coords, data has {n_coords}"
-        )
+        msg = f"average_shape has {avg_flat.shape[1]} coords, data has {n_coords}"
+        raise ValueError(msg)
 
     if verbose:
         print(f"Running DMD with {n_modes} modes, delay d={d}")
@@ -513,14 +514,14 @@ def convergence_analysis(
     if max_modes is None:
         max_modes = min(20, markers.shape[0] // 2)
 
-    results: dict[str, list] = dict(
-        n_modes=[],
-        rmse_mean=[],
-        rmse_std=[],
-        variance_explained=[],
-        dmd_results=[],
-        reconstructions=[],
-    )
+    results: dict[str, list] = {
+        "n_modes": [],
+        "rmse_mean": [],
+        "rmse_std": [],
+        "variance_explained": [],
+        "dmd_results": [],
+        "reconstructions": [],
+    }
 
     for nm in range(2, max_modes + 1, 2):
         try:
