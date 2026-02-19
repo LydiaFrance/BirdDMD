@@ -1,128 +1,51 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "birddmd"
-dynamic = ["version"]
-authors = [
-  { name = "Lydia France", email = "lfrance@turing.ac.uk" },
-]
-description = "Using DMD on bird wing data. "
+name = "BirdDMD"
+version = "1.0.0"
+description = "Dynamic Mode Decomposition for bird flight analysis"
 readme = "README.md"
 requires-python = ">=3.10"
-classifiers = [
-  "Development Status :: 1 - Planning",
-  "Intended Audience :: Science/Research",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Topic :: Scientific/Engineering",
+license = "MIT"
+authors = [
+    { name = "Lydia France" },
 ]
 dependencies = [
-    "pandas",
     "numpy",
+    "pandas",
     "matplotlib",
+    "scipy",
     "pydmd",
-    "ipympl",
-    "jupyter",
-    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@multi"
+    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@kestrels",
 ]
-
-[tool.setuptools.dynamic]
-version = {attr = "birddmd.__version__"}
 
 [project.optional-dependencies]
-test = [
-  "pytest >=6",
-  "pytest-cov >=3",
+notebooks = [
+    "jupyter",
+    "ipympl",
+    "plotly",
+    "kaleido",
+    "seaborn",
+    "ipywidgets",
 ]
 dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
+    "pytest",
+    "pytest-cov",
+    "ruff",
 ]
 
-[project.urls]
-Homepage = "https://github.com/LydiaFrance/birddmd"
-"Bug Tracker" = "https://github.com/LydiaFrance/birddmd/issues"
-Discussions = "https://github.com/LydiaFrance/birddmd/discussions"
-Changelog = "https://github.com/LydiaFrance/birddmd/releases"
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = [
-  "error",
-  "ignore::UserWarning:pydmd.*:",  # Ignore UserWarnings from pydmd
-]
-log_cli_level = "INFO"
-testpaths = [
-  "tests",
-]
-
-[tool.coverage]
-run.source = ["birddmd"]
-port.exclude_lines = [
-  'pragma: no cover',
-  '\.\.\.',
-  'if typing.TYPE_CHECKING:',
-]
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.ruff]
-# where to look for source
-src = ["src"]
-exclude = ["build", "dist", "generated/**"]
+target-version = "py310"
 line-length = 88
 
-[tool.ruff.format]
-docstring-code-format = true
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.10"
 
-[tool.ruff.lint]
-select = [
-  "E", "F", "W",
-  "B", "I", "ARG", "C4", "EM", "ICN", "ISC", "G",
-  "PGH", "PIE", "PL", "PT", "RET", "RUF", "SIM", "UP", "YTT", "EXE",
-]
-ignore = [
-  "PLR",    # design-related pylint codes
-  "PLR0913", # Too many arguments
-  "ISC001", # conflicts with formatter
-]
-
-# Per-file relaxations
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = ["D", "S"]         # docstring + security relaxed for tests
-"notebooks/**" = ["I", "E501"]  # ignore import-order and long lines in notebooks
-"scripts/**" = ["D"]             # scripts can be more permissive
-
-[tool.ruff.lint.flake8-unused-arguments]
-ignore-variadic-names = true
-
-[tool.ruff.lint.pylint]
-max-args = 7
-
-[tool.ty]
-# main configuration section
-
-[tool.ty.rules]
-# start with warnings locally so pre-commit shows issues without blocking commits
-all = "warn"
-# example: silence UNUSED-IMPORT rule if it's noisy, otherwise leave for checks
-# unused-import = "ignore"
-
-[tool.ty.analysis]
-allowed-unresolved-imports = ["tests.**", "third_party.**"]
-respect-type-ignore-comments = true
-
-# make tests more permissive
-[[tool.ty.overrides]]
-include = ["tests/**", "**/test_*.py"]
-[tool.ty.overrides.rules]
-possibly-unresolved-reference = "warn"
+[tool.hatch.build.targets.wheel]
+packages = ["src/BirdDMD"]
