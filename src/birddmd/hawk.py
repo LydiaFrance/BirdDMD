@@ -46,6 +46,8 @@ from ._constants import (
     HAWK_META_COLUMNS,
     MARKER_COLOURS,
     MARKER_POSITIONS,
+    N_BILATERAL_MARKERS,
+    N_UNILATERAL_MARKERS,
 )
 from .core import run_dmd
 from .data import (
@@ -120,10 +122,7 @@ def load_bird_data(
         1-D string array of marker column names, length
         ``n_markers * 3``.
     """
-    if perch_distance is None:
-        pd_str = ""
-    else:
-        pd_str = perch_distance
+    pd_str = "" if perch_distance is None else perch_distance
 
     if perch_distance == "9m":
         path = (
@@ -185,11 +184,15 @@ def get_average_shape(
         mean_shape_path = MEAN_SHAPE_PATH
 
     hawk3d = Hawk3D(mean_shape_path)
-    if n_markers == 8:
+    if n_markers == N_BILATERAL_MARKERS:
         return hawk3d.markers
-    if n_markers == 4:
+    if n_markers == N_UNILATERAL_MARKERS:
         return hawk3d.right_markers
-    raise ValueError(f"Expected 4 or 8 markers, got {n_markers}")
+    msg = (
+        f"Expected {N_UNILATERAL_MARKERS} or {N_BILATERAL_MARKERS} markers,"
+        f" got {n_markers}"
+    )
+    raise ValueError(msg)
 
 
 def normalise_hawk_data(
@@ -220,12 +223,15 @@ def normalise_hawk_data(
     ValueError
         If *markers* is not 2-D or 3-D.
     """
-    if markers.ndim == 3:
+    DIMS_2 = 2
+    DIMS_3 = 3
+    if markers.ndim == DIMS_3:
         n_markers = markers.shape[1]
-    elif markers.ndim == 2:
-        n_markers = markers.shape[1] // 3
+    elif markers.ndim == DIMS_2:
+        n_markers = markers.shape[1] // DIMS_3
     else:
-        raise ValueError(f"Expected 2-D or 3-D data, got {markers.ndim}-D")
+        msg = f"Expected 2-D or 3-D data, got {markers.ndim}-D"
+        raise ValueError(msg)
 
     average_shape = get_average_shape(n_markers)
     return normalise_data(markers, average_shape), average_shape
@@ -278,7 +284,7 @@ def run_hawk_dmd(
     times: np.ndarray | None = None,
     n_modes: int = 6,
     d: int = 2,
-    eig_constraints: set[str] = {"conjugate_pairs"},
+    eig_constraints: set[str] | None = None,
     n_markers: int = 8,
     mean_shape_path: str | None = None,
     verbose: bool = True,
@@ -303,8 +309,9 @@ def run_hawk_dmd(
         Number of DMD modes (SVD rank).
     d : int
         Hankel delay-embedding depth.
-    eig_constraints : set of str
+    eig_constraints : set of str, optional
         Constraints passed to BOPDMD, e.g. ``{"conjugate_pairs"}``.
+        Defaults to ``{"conjugate_pairs"}``.
     n_markers : int
         Number of anatomical markers (8 bilateral, 4 unilateral).
     mean_shape_path : str, optional
@@ -321,6 +328,8 @@ def run_hawk_dmd(
         Complete DMD results including eigenvalues, modes,
         reconstruction, etc.
     """
+    if eig_constraints is None:
+        eig_constraints = {"conjugate_pairs"}
     avg = get_average_shape(n_markers, mean_shape_path)
     return run_dmd(
         data=data,
@@ -343,7 +352,7 @@ def run_sequence_dmd(
     seqID: str,
     n_modes: int = 10,
     d: int = 2,
-    eig_constraints: set[str] = {"conjugate_pairs"},
+    eig_constraints: set[str] | None = None,
     min_seq_length: int | None = None,
     interpolate: bool = False,
     verbose: bool = True,
@@ -371,8 +380,9 @@ def run_sequence_dmd(
         Number of DMD modes (SVD rank).
     d : int
         Hankel delay-embedding depth.
-    eig_constraints : set of str
+    eig_constraints : set of str, optional
         Constraints passed to BOPDMD, e.g. ``{"conjugate_pairs"}``.
+        Defaults to ``{"conjugate_pairs"}``.
     min_seq_length : int, optional
         Minimum number of frames required.  Sequences shorter than
         this are skipped.  Defaults to ``n_modes + 1``.
@@ -388,6 +398,8 @@ def run_sequence_dmd(
         Complete DMD results, or ``None`` if the sequence has fewer
         frames than *min_seq_length*.
     """
+    if eig_constraints is None:
+        eig_constraints = {"conjugate_pairs"}
     df, marker_cols = load_bird_data(
         bird_name=bird_name,
         behaviour=behaviour,
@@ -543,7 +555,7 @@ def batch_rmse_analysis(
 
 def plot_hawk_markers(
     dataframe: pd.DataFrame,
-    marker_column_names: np.ndarray,
+    _marker_column_names: np.ndarray,
     x_axis: str = "HorzDistance",
 ) -> Figure:
     """Plot a 4x3 scatter grid of marker positions.
@@ -599,7 +611,7 @@ def plot_hawk_markers(
 
             if ci == 0:
                 ax[idx].set_ylabel(pos, fontsize=10)
-            if pi == 3:
+            if pi == len(MARKER_POSITIONS) - 1:
                 ax[idx].set_xlabel(x_axis, fontsize=10)
             if pi == 0:
                 ax[idx].set_title(coord, fontsize=12)
@@ -613,7 +625,7 @@ def plot_hawk_markers(
 
 def plot_hawk_markers_shaded(
     dataframe: pd.DataFrame,
-    marker_column_names: np.ndarray,
+    _marker_column_names: np.ndarray,
     x_axis: str = "HorzDistance",
     bin_size: float = 0.01,
 ) -> Figure:
@@ -737,24 +749,25 @@ def plot_hawk_markers_shaded(
             ax[idx].yaxis.set_ticklabels([])
             _remove_spines(ax[idx])
 
-            if pi == 3 and ci == 0:
-                x_label = "Horizontal Distance to perch (m)" if negate else "time (s)"
-                ax[idx].set_xlabel(x_label, fontsize=10)
-                xr = round(dataframe[x_axis].max(), 1)
-                ax[idx].set_xticks([0, xr])
-                ax[idx].set_xticklabels([0, xr])
-                y_lo, y_hi = ax[idx].get_ylim()
-                ax[idx].hlines(y=y_lo, xmin=0, xmax=xr, color="k", linewidth=2)
-                tick = abs(y_hi) * 0.04
-                ax[idx].vlines(
-                    x=0, ymin=y_lo, ymax=y_lo + tick, color="k", linewidth=1.5
-                )
-                ax[idx].vlines(
-                    x=xr, ymin=y_lo, ymax=y_lo + tick, color="k", linewidth=1.5
-                )
+            if pi == len(MARKER_POSITIONS) - 1 and ci == 0:
+                _format_bottom_axis(ax[idx], dataframe, x_axis, negate)
 
     plt.tight_layout()
     return fig
+
+
+def _format_bottom_axis(ax, dataframe, x_axis: str, negate: bool) -> None:
+    """Add x-axis labels and tick marks to the bottom-left subplot."""
+    x_label = "Horizontal Distance to perch (m)" if negate else "time (s)"
+    ax.set_xlabel(x_label, fontsize=10)
+    xr = round(dataframe[x_axis].max(), 1)
+    ax.set_xticks([0, xr])
+    ax.set_xticklabels([0, xr])
+    y_lo, y_hi = ax.get_ylim()
+    ax.hlines(y=y_lo, xmin=0, xmax=xr, color="k", linewidth=2)
+    tick = abs(y_hi) * 0.04
+    ax.vlines(x=0, ymin=y_lo, ymax=y_lo + tick, color="k", linewidth=1.5)
+    ax.vlines(x=xr, ymin=y_lo, ymax=y_lo + tick, color="k", linewidth=1.5)
 
 
 def _remove_spines(ax, keep_bottom: bool = False):
