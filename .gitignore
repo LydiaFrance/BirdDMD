@@ -6,8 +6,8 @@ data/processed/*
 !data/processed/Toothless_flapping_binned.npz
 !data/processed/Toothless_full_flight_binned.npz
 !data/processed/Toothless_turning_binned.npz
-!data/samples/
-data/samples/*
+# !data/samples/
+# data/samples/*
 !data/samples/ColumnNames.npz
 !data/samples/Flapping_9mStraightTurnToothless_Bilateral.npz
 
