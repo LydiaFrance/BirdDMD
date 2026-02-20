@@ -2,7 +2,7 @@
 
 [![Actions Status][actions-badge]][actions-link]
 
-![DMD overview figure](notebooks/figures/DMD_figure1.png)
+<img src="notebooks/figures/DMD_figure1.png" width="600"/>
 
 BirdDMD is a minimal toolkit for decomposing
 motion-capture time series into spatially coherent oscillatory modes.
