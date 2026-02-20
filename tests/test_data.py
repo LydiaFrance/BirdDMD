@@ -7,7 +7,8 @@ and expansion utilities.
 import numpy as np
 import pandas as pd
 import pytest
-from BirdDMD.data import (
+
+from birddmd.data import (
     add_average_shape,
     bin_dataframe_means,
     expand_marker_sequence,
@@ -17,8 +18,7 @@ from BirdDMD.data import (
     remove_time_duplicates,
     validate_marker_data,
 )
-
-from BirdDMD.stats import variance_explained
+from birddmd.stats import variance_explained
 
 # ── Validation ──────────────────────────────────────────────────────
 

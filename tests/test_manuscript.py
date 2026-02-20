@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from BirdDMD import (
+from birddmd import (
     bin_dataframe_means,
     compute_rmse,
     filter_sequences,
