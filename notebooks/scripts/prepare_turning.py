@@ -13,7 +13,7 @@ Run from the notebooks/ directory:
 import numpy as np
 import pandas as pd
 
-from BirdDMD import bin_dataframe_means, load_sequence_data, remove_time_duplicates
+from birddmd import bin_dataframe_means, load_sequence_data, remove_time_duplicates
 
 # ── Column names ─────────────────────────────────────────────────────
 col_names_turn = np.load("../data/samples/2025-07-25_ColumnNames.npz")
