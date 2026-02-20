@@ -23,6 +23,7 @@ DMDResult
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Any
 
@@ -270,7 +271,13 @@ def _fit_bopdmd(
         raise ValueError(msg)
 
     try:
-        dmd.fit(data, t=times[1:])
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Initial trial of Optimized DMD failed to converge",
+                category=UserWarning,
+            )
+            dmd.fit(data, t=times[1:])
     except Exception as exc:
         msg = f"BOPDMD fit failed: {exc}"
         raise RuntimeError(msg) from exc
@@ -362,7 +369,7 @@ def run_dmd(
     This is the main entry point.  It validates the input, centres the
     data, fits a Hankel-preprocessed BOPDMD model, reorders results by
     amplitude, reconstructs the full time series, and packages
-    everything into a :class:`DMDResult`.
+    everything into a `DMDResult`.
 
     Parameters
     ----------
