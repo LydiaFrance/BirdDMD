@@ -1,153 +1,122 @@
+"""BirdDMD — Dynamic Mode Decomposition for bird flight analysis.
+
+A minimal, scientist-friendly toolkit for decomposing motion-capture
+time series into spatially coherent oscillatory modes.
+
+Modules
+-------
+core
+    ``DMDResult``, ``run_dmd``, ``detect_conjugate_pairs``,
+    ``convergence_analysis``.
+reconstruction
+    ``reconstruct``, ``forecast``.
+data
+    Validation, normalisation, binning, reshaping.
+stats
+    ``compute_rmse``, ``filter_sequences``, ``variance_explained``.
+plotting
+    Dataset-agnostic DMD plots.
+hawk
+    Hawk-specific loading, wrappers, and plots.
 """
-BirdDMD - Dynamic Mode Decomposition for Bird Flight Analysis
 
-This package provides tools for analyzing bird flight data using Dynamic Mode Decomposition (DMD).
-It includes functionality for data loading, DMD computation, reconstruction, and analysis.
+__version__ = "1.0.0"
 
-Main modules:
-- data_handling: Core data loading and preprocessing
-- dmd_core: Core DMD computation and analysis
-- dmd_reconstruction: DMD reconstruction and mode modification
-- pca_analysis: PCA-related analysis functions
-- io: File input/output operations
-- exceptions: Custom exception classes
-- visualisation: Plotting and visualisation functions
-"""
+# ── Core ────────────────────────────────────────────────────────────
 
-# Core DMD functionality
-from .dmd_core import (
+from ._constants import (
+    DEFAULT_MARKER_NAMES,
+    HAWK_META_COLUMNS,
+    MARKER_COLOURS,
+    MARKER_POSITIONS,
+)
+from .core import (
+    DMDResult,
+    convergence_analysis,
+    detect_conjugate_pairs,
     run_dmd,
-    run_sequence_dmd,
-    run_marker_dmd,
-    run_timeseries_dmd,
-    run_single_wingbeat_dmd,
-    dmd_loop_seqs,
-    reorder_dmd_results
 )
 
-# DMD reconstruction and mode modification
-from .dmd_reconstruction import (
-    reconstruct_dmd,
-    reconstruct_specific_modes,
-    run_forecast,
-    run_forecast_with_modified_modes,
-    modify_mode_frequencies
-)
-
-# Data handling and preprocessing
-from .data_handling import (
-    load_bird_data,
-    load_sequence_data,
-    remove_time_duplicates,
-    get_average_shape,
-    normalise_data,
+# ── Data ────────────────────────────────────────────────────────────
+from .data import (
     add_average_shape,
-    reshape_data,
-    spline_interpolation
+    bin_dataframe_means,
+    expand_marker_sequence,
+    expand_time_sequence,
+    load_sequence_data,
+    normalise_data,
+    remove_time_duplicates,
+    spline_interpolation,
 )
 
-# PCA analysis
-from .pca_space import (
-    make_unilateral_keypoints,
-    project_into_pca_space,
-    project_into_coordinate_space,
-    create_scores_info_df
-)
-
-# I/O operations
-from .io import (
-    save_sequence_results,
-    load_sequence_results,
-    load_dmd_results
-)
-
-# Visualisation
-from .visualisation import (
-    plot_markers_overDist,
-    plot_2d_markers,
+# ── Hawk convenience layer ──────────────────────────────────────────
+from .hawk import (
+    MEAN_SHAPE_PATH,
+    SAMPLES_DIR,
+    batch_rmse_analysis,
+    bin_hawk_dataframe,
+    get_average_shape,
+    load_bird_data,
+    normalise_hawk_data,
+    plot_hawk_2d,
+    plot_hawk_markers,
+    plot_hawk_markers_shaded,
     plot_single_sequence,
+    run_hawk_dmd,
+    run_sequence_dmd,
+)
+
+# ── Plotting ────────────────────────────────────────────────────────
+from .plotting import (
     plot_amplitude_ranking,
-    plot_score_multi_PCs
+    plot_convergence,
+    plot_mode_dynamics,
 )
 
-# Exceptions
-from .exceptions import (
-    BirdDMDError,
-    ValidationError,
-    ComputationError,
-    DataError,
-    ShapeError,
-    IOError,
-    FileNotFoundError,
-    DataValidationError,
-    ConfigurationError,
-    InterpolationError,
-    ReconstructionError,
-    ModeError,
-    EigenvalueError
-)
+# ── Reconstruction ──────────────────────────────────────────────────
+from .reconstruction import forecast, reconstruct
 
-# Version
-__version__ = "0.1.0"
+# ── Stats ───────────────────────────────────────────────────────────
+from .stats import compute_rmse, filter_sequences, variance_explained
 
-# Define public API
+# ── Public API ──────────────────────────────────────────────────────
+
 __all__ = [
-    # Core DMD
-    'run_dmd',
-    'run_sequence_dmd',
-    'run_marker_dmd',
-    'run_timeseries_dmd',
-    'run_single_wingbeat_dmd',
-    'dmd_loop_seqs',
-    
-    # Reconstruction
-    'reconstruct_dmd',
-    'reconstruct_specific_modes',
-    'run_forecast',
-    'run_forecast_with_modified_modes',
-    'modify_mode_frequencies',
-    'reorder_dmd_results',
-    
-    # Data handling
-    'load_bird_data',
-    'load_sequence_data',
-    'remove_time_duplicates',
-    'get_average_shape',
-    'normalise_data',
-    'add_average_shape',
-    'reshape_data',
-    'spline_interpolation',
-    
-    # PCA analysis
-    'make_unilateral_keypoints',
-    'project_into_pca_space',
-    'project_into_coordinate_space',
-    'create_scores_info_df',
-    
-    # I/O operations
-    'save_sequence_results',
-    'load_sequence_results',
-    'load_dmd_results',
-    
-    # Visualisation
-    'plot_markers_overDist',
-    'plot_2d_markers',
-    'plot_single_sequence',
-    'plot_amplitude_ranking',
-    'plot_score_multi_PCs',
-    
-    # Exceptions
-    'BirdDMDError',
-    'ValidationError',
-    'ComputationError',
-    'DataError',
-    'ShapeError',
-    'IOError',
-    'FileNotFoundError',
-    'DataValidationError',
-    'ConfigurationError',
-    'InterpolationError',
-    'ReconstructionError',
-    'ModeError',
-    'EigenvalueError'
+    "DEFAULT_MARKER_NAMES",
+    "HAWK_META_COLUMNS",
+    "MARKER_COLOURS",
+    "MARKER_POSITIONS",
+    "MEAN_SHAPE_PATH",
+    "SAMPLES_DIR",
+    "DMDResult",
+    "add_average_shape",
+    "batch_rmse_analysis",
+    "bin_dataframe_means",
+    "bin_hawk_dataframe",
+    "compute_rmse",
+    "convergence_analysis",
+    "detect_conjugate_pairs",
+    "expand_marker_sequence",
+    "expand_time_sequence",
+    "filter_sequences",
+    "forecast",
+    "get_average_shape",
+    "load_bird_data",
+    "load_sequence_data",
+    "normalise_data",
+    "normalise_hawk_data",
+    "plot_amplitude_ranking",
+    "plot_convergence",
+    "plot_hawk_2d",
+    "plot_hawk_markers",
+    "plot_hawk_markers_shaded",
+    "plot_mode_dynamics",
+    "plot_single_sequence",
+    "reconstruct",
+    "remove_time_duplicates",
+    "run_dmd",
+    "run_hawk_dmd",
+    "run_sequence_dmd",
+    "spline_interpolation",
+    "variance_explained",
 ]
