@@ -15,6 +15,11 @@ DEFAULT_N_MODES: int = 10
 DEFAULT_DELAY: int = 2
 DEFAULT_EIG_CONSTRAINTS: set[str] = {"conjugate_pairs"}
 
+# ── Array shape constants ──────────────────────────────────────────
+NDIM_2D: int = 2
+NDIM_3D: int = 3
+N_SPATIAL: int = 3  # x, y, z coordinates per marker
+
 # ── Data filtering defaults ─────────────────────────────────────────
 DEFAULT_BIN_SIZE: float = 0.005
 DEFAULT_GAP_THRESHOLD: float = 0.15
