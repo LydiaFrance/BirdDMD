@@ -11,7 +11,7 @@ Run from the notebooks/ directory:
 import numpy as np
 import pandas as pd
 
-from BirdDMD import bin_dataframe_means, load_sequence_data, remove_time_duplicates
+from birddmd import bin_dataframe_means, load_sequence_data, remove_time_duplicates
 
 # ── Load raw data ────────────────────────────────────────────────────
 column_names = np.load("../data/samples/ColumnNames2.npz")
