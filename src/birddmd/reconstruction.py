@@ -2,9 +2,9 @@
 
 Two functions replace the seven in the old ``dmd_reconstruction`` module:
 
-* :func:`reconstruct` — rebuild the signal from selected modes/pairs,
+* `reconstruct` — rebuild the signal from selected modes/pairs,
   with optional stabilisation.
-* :func:`forecast` — like ``reconstruct`` but designed for extrapolation,
+* `forecast` — like ``reconstruct`` but designed for extrapolation,
   with eigenvalue modification support.
 
 Functions
@@ -188,7 +188,7 @@ def reconstruct(
     Parameters
     ----------
     result : DMDResult
-        Output of :func:`run_dmd`.
+        Output of `run_dmd`.
     times : np.ndarray, optional
         Time vector.  Defaults to ``result.times[1:]`` (the training
         window minus the first frame, matching BOPDMD convention).
@@ -274,14 +274,14 @@ def forecast(
 ) -> np.ndarray:
     """Extrapolate beyond the training window.
 
-    Like :func:`reconstruct` but with additional controls for
+    Like `reconstruct` but with additional controls for
     eigenvalue modification (e.g. changing frequencies, zeroing
     specific modes).
 
     Parameters
     ----------
     result : DMDResult
-        Output of :func:`run_dmd`.
+        Output of `run_dmd`.
     times : np.ndarray
         Forecast time vector (may extend beyond training window).
     pairs : list of int, optional
