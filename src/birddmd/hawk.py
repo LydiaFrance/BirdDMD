@@ -201,7 +201,7 @@ def normalise_hawk_data(
     """Centre hawk markers by subtracting the mean hawk shape.
 
     Infers the marker count from the array shape, loads the
-    corresponding mean shape via :func:`get_average_shape`, and
+    corresponding mean shape via `get_average_shape`, and
     subtracts it from every frame.
 
     Parameters
@@ -247,14 +247,14 @@ def bin_hawk_dataframe(
 ) -> pd.DataFrame:
     """Bin a hawk DataFrame, casting hawk-specific columns to float.
 
-    Wraps :func:`~BirdDMD.data.bin_dataframe_means`, automatically
+    Wraps `bin_dataframe_means`, automatically
     casting ``HorzDistance`` and ``VertDistance`` to float before
     binning.
 
     Parameters
     ----------
     dataframe : pd.DataFrame
-        Hawk flight DataFrame (e.g. from :func:`load_bird_data`).
+        Hawk flight DataFrame (e.g. from `load_bird_data`).
     x_axis : str
         Column to bin along, typically ``'HorzDistance'`` (spatial) or
         ``'time'`` (temporal).
@@ -293,7 +293,7 @@ def run_hawk_dmd(
     """Run DMD with hawk defaults.
 
     Loads the mean hawk shape automatically and delegates to
-    :func:`~BirdDMD.core.run_dmd`.  This is the recommended entry
+    `run_dmd`.  This is the recommended entry
     point for single-array hawk analyses where you already have the
     marker data in memory.
 
@@ -319,7 +319,7 @@ def run_hawk_dmd(
     verbose : bool
         If ``True``, print fitting diagnostics.
     **kwargs
-        Additional keyword arguments forwarded to :func:`run_dmd`
+        Additional keyword arguments forwarded to `run_dmd`
         (e.g. *init_alpha*).
 
     Returns
@@ -359,9 +359,9 @@ def run_sequence_dmd(
 ) -> DMDResult | None:
     """Load one hawk sequence from disk and run DMD on it.
 
-    Convenience wrapper that chains :func:`load_bird_data`,
-    :func:`~BirdDMD.data.load_sequence_data`, optional spline
-    interpolation, and :func:`~BirdDMD.core.run_dmd` into a single
+    Convenience wrapper that chains `load_bird_data`,
+    `load_sequence_data`, optional spline
+    interpolation, and `run_dmd` into a single
     call.
 
     Parameters
@@ -461,7 +461,7 @@ def batch_rmse_analysis(
     ----------
     df : pd.DataFrame
         Full hawk dataset containing all sequences (e.g. from
-        :func:`load_bird_data`).
+        `load_bird_data`).
     seqIDs : list of str
         Sequence identifiers to analyse.
     marker_column_names : np.ndarray
@@ -570,7 +570,7 @@ def plot_hawk_markers(
     dataframe : pd.DataFrame
         Hawk flight DataFrame with marker columns following the
         ``{side}_{position}_{axis}`` naming convention.
-    marker_column_names : np.ndarray
+    _marker_column_names : np.ndarray
         1-D string array of marker column names (used for layout
         consistency; individual columns are constructed from
         ``MARKER_POSITIONS``).
@@ -631,7 +631,7 @@ def plot_hawk_markers_shaded(
 ) -> Figure:
     """Plot a 4x3 grid of binned mean +/- 1 SD bands for hawk markers.
 
-    Same layout as :func:`plot_hawk_markers` but instead of raw
+    Same layout as `plot_hawk_markers` but instead of raw
     scatter points, data are binned along *x_axis* and the mean is
     shown as a solid (left) or dotted (right) line with a shaded
     +/- 1 standard deviation band.  The x-coordinate uses absolute
@@ -642,7 +642,7 @@ def plot_hawk_markers_shaded(
     dataframe : pd.DataFrame
         Hawk flight DataFrame with marker columns following the
         ``{side}_{position}_{axis}`` naming convention.
-    marker_column_names : np.ndarray
+    _marker_column_names : np.ndarray
         1-D string array of marker column names.
     x_axis : str
         Column to bin along.  ``'HorzDistance'`` (negated
