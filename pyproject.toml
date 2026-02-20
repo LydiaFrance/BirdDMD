@@ -53,6 +53,7 @@ line-length = 88
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR2004"]
 "notebooks/scripts/**" = ["PLR2004"]
+"notebooks/**/*.ipynb" = ["F401"]
 
 [tool.pyright]
 typeCheckingMode = "basic"
