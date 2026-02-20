@@ -16,7 +16,7 @@ import pandas as pd
 from birddmd import bin_dataframe_means, load_sequence_data, remove_time_duplicates
 
 # ── Column names ─────────────────────────────────────────────────────
-col_names_turn = np.load("../data/samples/2025-07-25_ColumnNames.npz")
+col_names_turn = np.load("../data/samples/ColumnNames_obstacle.npz")
 marker_column_names = col_names_turn["marker_column_names"]
 info_column_names_turn = col_names_turn["info_column_names"]
 

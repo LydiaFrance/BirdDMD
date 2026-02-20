@@ -140,7 +140,7 @@ def test_rmse_below_threshold(toothless_9m):
 @pytest.fixture(scope="module")
 def all_flapping():
     """Load the aggregated flapping dataset (all birds)."""
-    col_path = SAMPLES_DIR / "2025-07-25_ColumnNames.npz"
+    col_path = SAMPLES_DIR / "ColumnNames_obstacle.npz"
     data_path = SAMPLES_DIR / "FlappingBilateralNoRot.npz"
     if not col_path.exists() or not data_path.exists():
         pytest.skip("Aggregated flapping dataset not available")
