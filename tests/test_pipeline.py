@@ -11,8 +11,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import BirdDMD
-from BirdDMD import (
+import birddmd
+from birddmd import (
     DMDResult,
     bin_dataframe_means,
     compute_rmse,
@@ -310,7 +310,7 @@ def test_amplitude_ranking():
 
 def test_version():
     """Version is 1.0.0."""
-    assert BirdDMD.__version__ == "1.0.0"
+    assert birddmd.__version__ == "1.0.0"
 
 
 def test_old_functions_removed():
@@ -325,15 +325,15 @@ def test_old_functions_removed():
         "reorder_dmd_results",
         "make_dmd_results_dict",
         "add_mode_pair_fft_features",
-        "BirdDMDError",
+        "birddmdError",
         "ValidationError",
         "ComputationError",
     ]
     for name in old_names:
-        assert not hasattr(BirdDMD, name), f"{name} should be removed"
+        assert not hasattr(birddmd, name), f"{name} should be removed"
 
 
 def test_new_functions_accessible():
     """New API functions are accessible."""
-    for name in BirdDMD.__all__:
-        assert hasattr(BirdDMD, name), f"{name} missing from BirdDMD"
+    for name in birddmd.__all__:
+        assert hasattr(birddmd, name), f"{name} missing from birddmd"
