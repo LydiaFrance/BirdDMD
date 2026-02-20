@@ -1,6 +1,6 @@
 """Dataset-agnostic DMD visualisation.
 
-Hawk-specific marker plots live in :mod:`hawk`.  This module provides
+Hawk-specific marker plots live in `hawk`.  This module provides
 general-purpose DMD plots: amplitude ranking, mode dynamics,
 cumulative RMSE comparison, and convergence analysis.
 
@@ -234,7 +234,7 @@ def plot_convergence(results: dict) -> Figure:
     Parameters
     ----------
     results : dict
-        Output of :func:`core.convergence_analysis`.
+        Output of `convergence_analysis`.
 
     Returns
     -------
