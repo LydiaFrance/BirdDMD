@@ -1,124 +1,63 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "birddmd"
-version = "0.1.0"  # need to also update version in src/birddmd/__init__.py
-authors = [
-  { name = "Lydia France", email = "lfrance@turing.ac.uk" },
-]
-description = "Using DMD on bird wing data. "
+name = "BirdDMD"
+version = "1.0.0"
+description = "Dynamic Mode Decomposition for bird flight analysis"
 readme = "README.md"
 requires-python = ">=3.10"
-classifiers = [
-  "Development Status :: 1 - Planning",
-  "Intended Audience :: Science/Research",
-  "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Topic :: Scientific/Engineering",
+license = "MIT"
+authors = [
+    { name = "Lydia France" },
 ]
-dependencies = ["pandas",
-                "numpy",
-                "matplotlib",
-                "pydmd",
-                "ipympl",
-                "jupyter",
-                'morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@multi'
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "scipy",
+    "pydmd",
+    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@kestrels",
 ]
-[tool.setuptools.dynamic]
-version = {attr = "birddmd.__version__"}
+
 [project.optional-dependencies]
-test = [
-  "pytest >=6",
-  "pytest-cov >=3",
+notebooks = [
+    "jupyter",
+    "ipympl",
+    "plotly",
+    "kaleido",
+    "seaborn",
+    "ipywidgets",
 ]
 dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+    "mkdocs-jupyter>=0.25",
+    "mkdocs-section-index>=0.3",
 ]
 
-[project.urls]
-Homepage = "https://github.com/LydiaFrance/birddmd"
-"Bug Tracker" = "https://github.com/LydiaFrance/birddmd/issues"
-Discussions = "https://github.com/LydiaFrance/birddmd/discussions"
-Changelog = "https://github.com/LydiaFrance/birddmd/releases"
-
-
-[tool.hatch]
-version.path = "src/birddmd/__init__.py"
-envs.default.dependencies = [
-  "pytest",
-  "pytest-cov",
-]
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = [
-  "error",
-  "ignore::UserWarning:pydmd.*:",  # Ignore UserWarnings from pydmd
-]
-log_cli_level = "INFO"
-testpaths = [
-  "tests",
-]
-
-[tool.coverage]
-run.source = ["birddmd"]
-port.exclude_lines = [
-  'pragma: no cover',
-  '\.\.\.',
-  'if typing.TYPE_CHECKING:',
-]
-
-
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.ruff]
-src = ["src"]
-exclude = []
-line-length = 88  # how long you want lines to be
+target-version = "py310"
+line-length = 88
 
-[tool.ruff.format]
-docstring-code-format = true  # code snippets in docstrings will be formatted
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004"]
+"notebooks/scripts/**" = ["PLR2004"]
+"notebooks/**/*.ipynb" = ["F401", "PLR2004"]
 
-[tool.ruff.lint]
-select = [
-  "E", "F", "W", # flake8
-  "B",           # flake8-bugbear
-  "I",           # isort
-  "ARG",         # flake8-unused-arguments
-  "C4",          # flake8-comprehensions
-  "EM",          # flake8-errmsg
-  "ICN",         # flake8-import-conventions
-  "ISC",         # flake8-implicit-str-concat
-  "G",           # flake8-logging-format
-  "PGH",         # pygrep-hooks
-  "PIE",         # flake8-pie
-  "PL",          # pylint
-  "PT",          # flake8-pytest-style
-  "RET",         # flake8-return
-  "RUF",         # Ruff-specific
-  "SIM",         # flake8-simplify
-  "UP",          # pyupgrade
-  "YTT",         # flake8-2020
-  "EXE",         # flake8-executable
-]
-ignore = [
-  "PLR",    # Design related pylint codes
-  "ISC001", # Conflicts with formatter
-]
-unfixable = [
-  "F401",   # Would remove unused imports
-  "F841",   # Would remove unused variables
-]
-flake8-unused-arguments.ignore-variadic-names = true  # allow unused *args/**kwargs
+[tool.pyright]
+typeCheckingMode = "basic"
+pythonVersion = "3.10"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/birddmd"]

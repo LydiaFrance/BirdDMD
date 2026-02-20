@@ -50,7 +50,7 @@ python -m pip install .
 ### Basic DMD Analysis
 
 ```python
-from BirdDMD import run_sequence_dmd
+from birddmd import run_sequence_dmd
 
 # Run DMD on a specific sequence
 times, markers, Lambda, Modes, bn, Psi, phase_shifts, dmd_results, keypoints = run_sequence_dmd(
@@ -68,7 +68,7 @@ times, markers, Lambda, Modes, bn, Psi, phase_shifts, dmd_results, keypoints = r
 ### Mode Reconstruction and Modification
 
 ```python
-from BirdDMD import reconstruct_specific_modes, run_forecast_with_modified_modes
+from birddmd import reconstruct_specific_modes, run_forecast_with_modified_modes
 
 # Reconstruct specific modes
 mode_0_1_keypoints = reconstruct_specific_modes(times, dmd_results, [0,1])
@@ -89,7 +89,7 @@ keypoints = run_forecast_with_modified_modes(
 BirdDMD provides powerful capabilities for upsampling and forecasting wing movements. A key feature is the ability to create stable generative models of flapping motion using just a few carefully selected modes:
 
 ```python
-from BirdDMD import run_forecast_with_modified_modes
+from birddmd import run_forecast_with_modified_modes
 
 # Create a longer time vector for forecasting
 fake_time = np.linspace(times[0], times[-1]*3, len(times)*3)
@@ -114,7 +114,7 @@ This approach creates a stable generative model that closely matches the origina
 ### Visualisation
 
 ```python
-from BirdDMD import plot_markers_overDist, plot_amplitude_ranking
+from birddmd import plot_markers_overDist, plot_amplitude_ranking
 
 # Plot marker trajectories
 plot_markers_overDist(wingbeat_df, marker_column_names, x_axis='time')
