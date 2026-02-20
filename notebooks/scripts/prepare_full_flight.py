@@ -13,7 +13,7 @@ import pandas as pd
 from birddmd import bin_dataframe_means, load_sequence_data, remove_time_duplicates
 
 # ── Column names ─────────────────────────────────────────────────────
-column_names = np.load("../data/samples/ColumnNames2.npz")
+column_names = np.load("../data/samples/ColumnNames.npz")
 marker_column_names = column_names["marker_column_names"]
 info_column_names = column_names["info_column_names"]
 
