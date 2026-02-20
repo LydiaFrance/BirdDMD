@@ -2,15 +2,47 @@
 
 ## Installation
 
+BirdDMD depends on [morphing_birds](https://github.com/LydiaFrance/morphing_birds)
+via a git URL, so it must be installed from source (it is not yet on PyPI).
+
+### With uv (recommended)
+
 ```bash
-uv venv && source .venv/bin/activate
-uv pip install -e ".[notebooks]"
+git clone https://github.com/LydiaFrance/BirdDMD
+cd BirdDMD
+uv sync
+```
+
+To include notebook dependencies (Jupyter, Plotly, Seaborn, etc.):
+
+```bash
+uv sync --extra notebooks
 ```
 
 For documentation development:
 
 ```bash
-uv pip install -e ".[docs]"
+uv sync --extra docs
+```
+
+Both extras at once:
+
+```bash
+uv sync --extra notebooks --extra docs
+```
+
+### With pip
+
+```bash
+git clone https://github.com/LydiaFrance/BirdDMD
+cd BirdDMD
+python -m pip install .
+```
+
+With notebook dependencies:
+
+```bash
+python -m pip install ".[notebooks]"
 ```
 
 ## Key concepts
