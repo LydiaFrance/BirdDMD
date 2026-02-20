@@ -59,4 +59,4 @@ typeCheckingMode = "basic"
 pythonVersion = "3.10"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/BirdDMD"]
+packages = ["src/birddmd"]
