@@ -194,13 +194,13 @@ def plot_mode_dynamics(
         print(title)
 
         if y_lim is not None:
-            lim = (
-                float(y_lim[idx])
+            raw = (
+                y_lim[idx]
                 if isinstance(y_lim, (list, np.ndarray)) and idx < len(y_lim)
-                else float(y_lim)
+                else y_lim
             )
-            if lim is not None:
-                lim_val = lim
+            if raw is not None:
+                lim_val = float(raw)
                 ax.set_ylim(-lim_val, lim_val)
         if x_lim is not None:
             ax.set_xlim(x_lim)
