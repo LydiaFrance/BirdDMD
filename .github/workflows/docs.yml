@@ -25,7 +25,7 @@ jobs:
           lfs: true
       - uses: astral-sh/setup-uv@v7
       - run: uv run --extra docs mkdocs build --strict
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: site/
 
