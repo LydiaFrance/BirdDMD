@@ -1,5 +1,6 @@
 # BirdDMD
 
+<a href="https://doi.org/10.5281/zenodo.19169770"><img src="https://zenodo.org/badge/761292243.svg" alt="DOI"></a>
 [![Actions Status][actions-badge]][actions-link]
 
 <img src="notebooks/figures/DMD_figure1.png" width="600"/>
