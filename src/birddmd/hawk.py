@@ -1,7 +1,7 @@
 """Hawk-specific data loading, DMD wrappers, and visualisation.
 
 Everything specific to the hawk flight dataset lives here: NPZ file
-loading, mean-shape retrieval via ``morphing_birds.Hawk3D``, batch RMSE
+loading, mean-shape retrieval via ``morphing_birds.Animal3D``, batch RMSE
 analysis, and marker-position plots.  General-purpose DMD logic is in
 the other modules; this layer fills in hawk defaults.
 
@@ -10,7 +10,7 @@ Functions
 load_bird_data
     Load a hawk NPZ file into a DataFrame.
 get_average_shape
-    Return the mean hawk shape via ``Hawk3D``.
+    Return the mean hawk shape via ``Animal3D``.
 normalise_hawk_data
     Centre hawk markers by subtracting the mean shape.
 bin_hawk_dataframe
@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import MaxNLocator
-from morphing_birds import Hawk3D
+from morphing_birds import Animal3D
 
 from ._constants import (
     HAWK_META_COLUMNS,
@@ -154,9 +154,9 @@ def get_average_shape(
     n_markers: int,
     mean_shape_path: str | None = None,
 ) -> np.ndarray:
-    """Return the mean hawk shape via ``Hawk3D``.
+    """Return the mean hawk shape via ``Animal3D``.
 
-    Instantiates a ``morphing_birds.Hawk3D`` object from the mean-shape
+    Instantiates a ``morphing_birds.Animal3D`` object from the mean-shape
     CSV and returns either the full bilateral marker set or the
     right-side-only subset.
 
@@ -183,7 +183,7 @@ def get_average_shape(
     if mean_shape_path is None:
         mean_shape_path = MEAN_SHAPE_PATH
 
-    hawk3d = Hawk3D(mean_shape_path)
+    hawk3d = Animal3D("hawk", mean_shape_path)
     if n_markers == N_BILATERAL_MARKERS:
         return hawk3d.markers
     if n_markers == N_UNILATERAL_MARKERS:

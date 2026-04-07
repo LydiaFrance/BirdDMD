@@ -18,7 +18,7 @@ dependencies = [
     "matplotlib",
     "scipy",
     "pydmd",
-    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@kestrels",
+    "morphing_birds @ git+https://github.com/LydiaFrance/morphing_birds@main",
 ]
 
 [project.optional-dependencies]
