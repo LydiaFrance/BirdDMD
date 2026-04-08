@@ -1,6 +1,7 @@
 # Data — keep most files private, track only the minimal public set
 data/*
 !data/mean_hawk_shape.csv
+!data/mean_pigeon_shape.csv
 !data/processed/
 data/processed/*
 !data/processed/Toothless_flapping_binned.npz
